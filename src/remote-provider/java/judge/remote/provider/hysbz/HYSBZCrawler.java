@@ -3,9 +3,10 @@ package judge.remote.provider.hysbz;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import judge.httpclient.DedicatedHttpClient;
-import judge.httpclient.HttpStatusValidator;
+import judge.httpclient.*;
 import judge.remote.RemoteOjInfo;
+import judge.remote.account.config.RemoteAccountConfig;
+import judge.remote.account.config.RemoteAccountOJConfig;
 import judge.remote.crawler.RawProblemInfo;
 import judge.remote.crawler.SyncCrawler;
 import judge.tool.HtmlHandleUtil;
@@ -13,6 +14,7 @@ import judge.tool.Tools;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.springframework.stereotype.Component;
 
@@ -29,22 +31,44 @@ public class HYSBZCrawler extends SyncCrawler {
         new HttpHost("www.lydsy.com", 808, "http"),
     };
 
+    public static RemoteAccountOJConfig acount;
+
     @Override
     public RawProblemInfo crawl(String problemId) throws Exception {
         preValidate(problemId);
-        
+
         String problemUrl = null;
         String html = null;
-        for (HttpHost host : HOSTS) {
-            try {
-                DedicatedHttpClient client = dedicatedHttpClientFactory.build(host);
-                problemUrl = getProblemUrl(host, problemId);
-                html = client.get(problemUrl, HttpStatusValidator.SC_OK).getBody();
-                html = HtmlHandleUtil.transformUrlToAbs(html, problemUrl);
-                break;
-            } catch (Throwable t) {
+        for(RemoteAccountConfig acc : acount.accounts)
+        {
+            boolean ok = false;
+            for (HttpHost host : HOSTS) {
+                try {
+                    DedicatedHttpClient client = dedicatedHttpClientFactory.build(host);
+                    client.get("/JudgeOnline/logout.php", HttpStatusValidator.SC_OK);
+
+                    HttpEntity entity = SimpleNameValueEntityFactory.create( //
+                            "user_id", acc.id, //
+                            "password", acc.password);
+                    client.post("/JudgeOnline/login.php", entity, new SimpleHttpResponseValidator() {
+                        @Override
+                        public void validate(SimpleHttpResponse response) throws Exception {
+                            Validate.isTrue(response.getBody().contains("history.go(-2)"));
+                        }
+                    });
+
+                    problemUrl = getProblemUrl(host, problemId);
+                    html = client.get(problemUrl, HttpStatusValidator.SC_OK).getBody();
+                    html = HtmlHandleUtil.transformUrlToAbs(html, problemUrl);
+                    if(html.contains("<h2>Please contact lydsy2012@163.com!</h2>")) continue;
+                    ok = true;
+                    break;
+                } catch (Throwable t) {
+                }
             }
+            if(ok) break;
         }
+
         Validate.notBlank(html);
         
         RawProblemInfo info = new RawProblemInfo();

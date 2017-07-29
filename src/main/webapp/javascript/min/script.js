@@ -5662,7 +5662,13 @@ $(function() {
 					]
 	});
 });
-$(function() {
+function mathJaxFunc(){
+    if($('#useMathJax').prop('checked')){
+        $('head').append('<script async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>');
+    } else {
+        location.reload();
+    }
+}$(function() {
     if ($("#js_require_listProblem").length == 0) {
         return;
     }
@@ -6378,11 +6384,3 @@ $(function() {
 	sh_highlightDocument(basePath + '/shjsx/', '.min.js');
 	_showDiscuss();
 });
-
-function mathJaxFunc(){
-    if($('#useMathJax').prop('checked')){
-        $('head').append('<script async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>');
-    } else {
-        location.reload();
-    }
-}

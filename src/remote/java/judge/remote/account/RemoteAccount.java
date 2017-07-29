@@ -7,8 +7,8 @@ import org.apache.http.protocol.HttpContext;
 public class RemoteAccount {
     
     private final RemoteOj remoteOj;
-    private final String accountId;
-    private final String password;
+    private String accountId;
+    private String password;
     private final String exclusiveCode;
     private final HttpContext context;
     
@@ -36,5 +36,11 @@ public class RemoteAccount {
     public HttpContext getContext() {
         return context;
     }
-    
+
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

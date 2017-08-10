@@ -8,6 +8,7 @@ import judge.remote.account.RemoteAccountTask;
 import judge.remote.language.LanguageFinder;
 import judge.remote.language.LanguageFindersHolder;
 import judge.remote.loginer.LoginersHolder;
+import judge.remote.provider.hysbz.HYSBZSubmitter;
 import judge.tool.Handler;
 import org.apache.commons.lang3.Validate;
 import org.apache.http.HttpHost;
@@ -123,6 +124,11 @@ public abstract class CanonicalSubmitter implements Submitter {
             }
             DedicatedHttpClient client = dedicatedHttpClientFactory.build(getHost(), remoteAccount.getContext(),
                     getCharset());
+
+            if(getOjInfo().remoteOj.name().equals("HYSBZ")) {
+                HYSBZSubmitter.getAccess(info.remoteProblemId, remoteAccount, client);
+                info.remoteAccountId = remoteAccount.getAccountId();
+            }
 
             Integer runIdBefore = getMaxRunId(info, client, false);
 

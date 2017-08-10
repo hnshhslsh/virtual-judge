@@ -7,6 +7,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import judge.remote.RemoteOj;
 import judge.remote.account.config.RemoteAccountOJConfig;
 
+import judge.remote.provider.hysbz.HYSBZCrawler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,9 @@ public class RemoteAccountTaskExecutor {
         for (RemoteOj remoteOj : config.keySet()) {
             RemoteAccountOJConfig ojConfig = config.get(remoteOj);
             repos.put(remoteOj, new RemoteAccountRepository(remoteOj, ojConfig, this));
+            if(remoteOj.name().equals("HYSBZ")) {
+                HYSBZCrawler.acount = ojConfig;
+            }
         }
     }
     

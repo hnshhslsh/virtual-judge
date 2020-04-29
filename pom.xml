@@ -10,7 +10,7 @@
 
     <properties>
         <org.apache.struts.version>2.3.35</org.apache.struts.version>
-        <org.springframework.version>4.3.18.RELEASE</org.springframework.version>
+        <org.springframework.version>5.2.4.RELEASE</org.springframework.version>
         <org.hibernate.version>3.6.9.Final</org.hibernate.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
